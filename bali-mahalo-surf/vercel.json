@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd bali-mahalo-surf && npm run build",
-  "devCommand": "cd bali-mahalo-surf && npm run dev",
-  "installCommand": "cd bali-mahalo-surf && npm install",
-  "outputDirectory": "bali-mahalo-surf/.next"
-}
