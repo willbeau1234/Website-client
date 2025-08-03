@@ -7,28 +7,33 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { submitBooking } from "./actions"
 
 export default function BaliMahaloSurfCo() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    message: "",
-  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Form submitted:", formData)
-    // Handle form submission here
-    alert("Thank you for your message! We'll get back to you soon.")
-    setFormData({ firstName: "", lastName: "", email: "", message: "" })
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
+  const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true)
+    setSubmitMessage("")
+    
+    try {
+      const result = await submitBooking(formData)
+      if (result.success) {
+        setSubmitMessage("Thank you for your message! We'll get back to you soon.")
+        // Reset form by clearing all form fields
+        const form = document.getElementById("booking-form") as HTMLFormElement
+        if (form) form.reset()
+      } else {
+        setSubmitMessage(result.error || "Failed to send message. Please try again.")
+        console.error('Form submission failed:', result)
+      }
+    } catch (error) {
+      setSubmitMessage(`Error: ${error}`)
+      console.error('Form submission error:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const scrollToBooking = () => {
@@ -42,7 +47,7 @@ export default function BaliMahaloSurfCo() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/placeholder.svg?height=1080&width=1920')`,
+            backgroundImage: `url('/995C20BD-412B-400A-B98A-450F0332F363.JPG')`,
           }}
         >
           <div className="absolute inset-0 bg-black/20"></div>
@@ -95,87 +100,6 @@ export default function BaliMahaloSurfCo() {
         </div>
       </section>
 
-      {/* Booking Section */}
-      <section id="booking" className="py-20 px-8 bg-white">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-center text-black">Book with us!</h2>
-          <p className="text-xl text-center mb-12 text-black">
-            Available seven days a week. Once you get in touch, we'll coordinate the ideal time based on surf conditions
-            and your schedule.
-          </p>
-
-          <Card className="border-2 border-gray-200">
-            <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-black mb-2">
-                      First Name *
-                    </label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      required
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="border-gray-300"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-black mb-2">
-                      Last Name *
-                    </label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      required
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="border-gray-300"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-                    Email *
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="border-gray-300"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-black mb-2">
-                    Message *
-                  </label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    className="border-gray-300"
-                  />
-                </div>
-
-                <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800 py-3 text-lg font-medium">
-                  Submit
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
       {/* Surf Trip Section */}
       <section className="py-20 px-8 bg-gray-50">
@@ -197,7 +121,7 @@ export default function BaliMahaloSurfCo() {
             <div
               className="h-96 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600')`,
+                backgroundImage: `url('/E827D3B1-F328-4055-87A4-198FBEAB354E 2.JPG')`,
               }}
             ></div>
           </div>
@@ -211,7 +135,7 @@ export default function BaliMahaloSurfCo() {
             <div
               className="h-96 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600')`,
+                backgroundImage: `url('/BC43AFB5-75A6-4A1F-96CC-CF7DCC58FDF5.JPG')`,
               }}
             ></div>
             <div>
@@ -239,15 +163,15 @@ export default function BaliMahaloSurfCo() {
             Watch our surf coaching in action and see the incredible waves that await you in Bali's pristine waters.
           </p>
           <div className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 mx-auto">
-                  <div className="w-0 h-0 border-l-8 border-l-black border-t-6 border-t-transparent border-b-6 border-b-transparent ml-1"></div>
-                </div>
-                <p className="text-lg">Video: Surf Coaching Highlights</p>
-                <p className="text-sm text-gray-300 mt-2">Click to play when video is added</p>
-              </div>
-            </div>
+            <video 
+              className="w-full h-full object-cover"
+              controls
+              preload="metadata"
+            >
+              <source src="/c00b41a8384b48ab81b5ebba45456446 2.MOV" type="video/quicktime" />
+              <source src="/c00b41a8384b48ab81b5ebba45456446 2.MOV" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       </section>
@@ -256,49 +180,21 @@ export default function BaliMahaloSurfCo() {
       <section className="py-20 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-semibold mb-16 text-center text-black">Meet Your Instructors</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div className="flex justify-center">
             <div className="text-center">
               <div
-                className="w-48 h-48 mx-auto mb-6 bg-cover bg-center rounded-full"
+                className="w-48 h-48 mx-auto mb-2 bg-cover bg-center rounded-full"
                 style={{
-                  backgroundImage: `url('/placeholder.svg?height=300&width=300&text=Instructor+1')`,
+                  backgroundImage: `url('/5161CCCC-25BB-4512-913E-DC4B15C9C838 2.JPG')`,
                 }}
               ></div>
-              <h3 className="text-2xl font-semibold mb-2 text-black">Made Surya</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-black">Wira Mahalo</h3>
               <p className="text-lg text-gray-600 mb-4">Head Instructor</p>
               <p className="text-black leading-relaxed">
                 Born and raised in Bali, Made has been surfing for over 15 years and coaching for 8. His deep connection
                 to the ocean and local knowledge makes every session unforgettable.
               </p>
-            </div>
-            <div className="text-center">
-              <div
-                className="w-48 h-48 mx-auto mb-6 bg-cover bg-center rounded-full"
-                style={{
-                  backgroundImage: `url('/placeholder.svg?height=300&width=300&text=Instructor+2')`,
-                }}
-              ></div>
-              <h3 className="text-2xl font-semibold mb-2 text-black">Kadek Ari</h3>
-              <p className="text-lg text-gray-600 mb-4">Advanced Technique Coach</p>
-              <p className="text-black leading-relaxed">
-                Specializing in advanced maneuvers and barrel riding, Kadek helps intermediate and advanced surfers push
-                their limits safely and effectively.
-              </p>
-            </div>
-            <div className="text-center">
-              <div
-                className="w-48 h-48 mx-auto mb-6 bg-cover bg-center rounded-full"
-                style={{
-                  backgroundImage: `url('/placeholder.svg?height=300&width=300&text=Instructor+3')`,
-                }}
-              ></div>
-              <h3 className="text-2xl font-semibold mb-2 text-black">Wayan Gede</h3>
-              <p className="text-lg text-gray-600 mb-4">Beginner Specialist</p>
-              <p className="text-black leading-relaxed">
-                Patient and encouraging, Wayan has helped hundreds of beginners catch their first waves. His calm
-                approach builds confidence in new surfers.
-              </p>
-            </div>
+             </div>
           </div>
         </div>
       </section>
@@ -311,37 +207,55 @@ export default function BaliMahaloSurfCo() {
             <div
               className="h-64 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600&text=Perfect+Barrel')`,
+                backgroundImage: `url('/389AADFB-CAC0-4ADC-B046-9B8C1F5C687D.JPG')`,
               }}
             ></div>
             <div
               className="h-64 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600&text=Sunset+Session')`,
+                backgroundImage: `url('/8149CEAE-AF24-491C-8E2D-7EB9FDD90C02.JPG')`,
               }}
             ></div>
             <div
               className="h-64 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600&text=Group+Lesson')`,
+                backgroundImage: `url('/8BBD0B35-BFC9-4E08-8BAF-9912EB027DD3 2.JPG')`,
               }}
             ></div>
             <div
               className="h-64 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600&text=Advanced+Maneuver')`,
+                backgroundImage: `url('/A1341AFD-0DA4-4CF9-87D9-8E5F55E82508 2.JPG')`,
               }}
             ></div>
             <div
               className="h-64 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600&text=Bali+Coastline')`,
+                backgroundImage: `url('/A5F6C367-789B-4747-BE75-BE3A7CF73FE0.JPG')`,
               }}
             ></div>
             <div
               className="h-64 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=400&width=600&text=Happy+Students')`,
+                backgroundImage: `url('/B409668B-47B3-404D-B73A-287B8D173245 2.JPG')`,
+              }}
+            ></div>
+            <div
+              className="h-64 bg-cover bg-center rounded-lg"
+              style={{
+                backgroundImage: `url('/C752294B-F64E-43DE-B40A-2DBC2A38F946.JPG')`,
+              }}
+            ></div>
+            <div
+              className="h-64 bg-cover bg-center rounded-lg"
+              style={{
+                backgroundImage: `url('/E0F158D1-E353-4EBE-950C-94B1E874BD71 2.JPG')`,
+              }}
+            ></div>
+            <div
+              className="h-64 bg-cover bg-center rounded-lg"
+              style={{
+                backgroundImage: `url('/E89EA4E6-8688-4996-8679-AD1131F18B93 2.JPG')`,
               }}
             ></div>
           </div>
@@ -349,68 +263,6 @@ export default function BaliMahaloSurfCo() {
       </section>
 
       {/* Surf Spots Section */}
-      <section className="py-20 px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-semibold mb-16 text-center text-black">Our Favorite Spots</h2>
-          <div className="space-y-16">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h3 className="text-3xl font-semibold mb-4 text-black">Uluwatu</h3>
-                <p className="text-xl text-black leading-relaxed mb-4">
-                  World-class left-hand barrel perfect for intermediate to advanced surfers. The temple backdrop makes
-                  every session spiritual.
-                </p>
-                <p className="text-lg text-gray-600">
-                  Best conditions: Dry season (April-October) • Swell: 4-8ft • Level: Intermediate+
-                </p>
-              </div>
-              <div
-                className="h-80 bg-cover bg-center rounded-lg"
-                style={{
-                  backgroundImage: `url('/placeholder.svg?height=500&width=700&text=Uluwatu+Waves')`,
-                }}
-              ></div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div
-                className="h-80 bg-cover bg-center rounded-lg md:order-1"
-                style={{
-                  backgroundImage: `url('/placeholder.svg?height=500&width=700&text=Canggu+Beach')`,
-                }}
-              ></div>
-              <div className="md:order-2">
-                <h3 className="text-3xl font-semibold mb-4 text-black">Canggu</h3>
-                <p className="text-xl text-black leading-relaxed mb-4">
-                  Consistent beach break with multiple peaks. Perfect for beginners and intermediate surfers looking to
-                  progress.
-                </p>
-                <p className="text-lg text-gray-600">
-                  Best conditions: Year-round • Swell: 2-6ft • Level: Beginner to Intermediate
-                </p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h3 className="text-3xl font-semibold mb-4 text-black">Padang Padang</h3>
-                <p className="text-xl text-black leading-relaxed mb-4">
-                  Shallow reef break offering perfect barrels. Made famous by "Eat, Pray, Love" - a true Bali gem.
-                </p>
-                <p className="text-lg text-gray-600">
-                  Best conditions: Dry season (May-September) • Swell: 3-6ft • Level: Advanced
-                </p>
-              </div>
-              <div
-                className="h-80 bg-cover bg-center rounded-lg"
-                style={{
-                  backgroundImage: `url('/placeholder.svg?height=500&width=700&text=Padang+Padang')`,
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Testimonials Section */}
       <section className="py-20 px-8 bg-gray-50">
@@ -422,7 +274,7 @@ export default function BaliMahaloSurfCo() {
                 <div
                   className="w-16 h-16 bg-cover bg-center rounded-full mr-4"
                   style={{
-                    backgroundImage: `url('/placeholder.svg?height=100&width=100&text=Sarah')`,
+                    backgroundImage: `url('/Screenshot 2025-08-02 at 19.57.29.png')`,
                   }}
                 ></div>
                 <div>
@@ -441,7 +293,7 @@ export default function BaliMahaloSurfCo() {
                 <div
                   className="w-16 h-16 bg-cover bg-center rounded-full mr-4"
                   style={{
-                    backgroundImage: `url('/placeholder.svg?height=100&width=100&text=Marcus')`,
+                    backgroundImage: `url('/Screenshot 2025-08-02 at 20.00.42.png')`,
                   }}
                 ></div>
                 <div>
@@ -460,7 +312,7 @@ export default function BaliMahaloSurfCo() {
                 <div
                   className="w-16 h-16 bg-cover bg-center rounded-full mr-4"
                   style={{
-                    backgroundImage: `url('/placeholder.svg?height=100&width=100&text=Lisa')`,
+                    backgroundImage: `url('/Screenshot 2025-08-02 at 20.01.28.png')`,
                   }}
                 ></div>
                 <div>
@@ -479,7 +331,7 @@ export default function BaliMahaloSurfCo() {
                 <div
                   className="w-16 h-16 bg-cover bg-center rounded-full mr-4"
                   style={{
-                    backgroundImage: `url('/placeholder.svg?height=100&width=100&text=Jake')`,
+                    backgroundImage: `url('/IMG_7293.jpeg')`,
                   }}
                 ></div>
                 <div>
@@ -488,7 +340,7 @@ export default function BaliMahaloSurfCo() {
                 </div>
               </div>
               <p className="text-lg text-black leading-relaxed italic">
-                "The skill training sessions with Kadek helped me finally nail the cutback I'd been trying to master for
+                "The skill training sessions with Made helped me finally nail the cutback I'd been trying to master for
                 years. Technical expertise combined with the soul of surfing."
               </p>
             </div>
@@ -496,62 +348,7 @@ export default function BaliMahaloSurfCo() {
         </div>
       </section>
 
-      {/* Packages Section */}
-      <section className="py-20 px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-semibold mb-16 text-center text-black">Surf Packages</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 p-8 rounded-lg">
-              <h3 className="text-2xl font-semibold mb-4 text-black">Beginner Package</h3>
-              <p className="text-3xl font-bold mb-6 text-black">
-                $75 <span className="text-lg font-normal text-gray-600">/ session</span>
-              </p>
-              <ul className="space-y-3 mb-8 text-black">
-                <li>• 2-hour lesson</li>
-                <li>• Surfboard included</li>
-                <li>• Wetsuit provided</li>
-                <li>• Beach safety briefing</li>
-                <li>• Photo package</li>
-              </ul>
-              <Button className="w-full bg-black text-white hover:bg-gray-800">Book Now</Button>
-            </div>
-
-            <div className="bg-black text-white p-8 rounded-lg relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white text-black px-4 py-2 rounded-full text-sm font-semibold">
-                Most Popular
-              </div>
-              <h3 className="text-2xl font-semibold mb-4">Intermediate Package</h3>
-              <p className="text-3xl font-bold mb-6">
-                $95 <span className="text-lg font-normal text-gray-300">/ session</span>
-              </p>
-              <ul className="space-y-3 mb-8">
-                <li>• 2.5-hour lesson</li>
-                <li>• Advanced technique focus</li>
-                <li>• Video analysis</li>
-                <li>• Multiple surf spots</li>
-                <li>• Personalized feedback</li>
-              </ul>
-              <Button className="w-full bg-white text-black hover:bg-gray-100">Book Now</Button>
-            </div>
-
-            <div className="bg-gray-50 p-8 rounded-lg">
-              <h3 className="text-2xl font-semibold mb-4 text-black">Advanced Package</h3>
-              <p className="text-3xl font-bold mb-6 text-black">
-                $120 <span className="text-lg font-normal text-gray-600">/ session</span>
-              </p>
-              <ul className="space-y-3 mb-8 text-black">
-                <li>• 3-hour intensive</li>
-                <li>• Barrel riding focus</li>
-                <li>• Competition preparation</li>
-                <li>• Premium surf spots</li>
-                <li>• Professional video analysis</li>
-              </ul>
-              <Button className="w-full bg-black text-white hover:bg-gray-800">Book Now</Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
+     
       {/* Culture & Philosophy Section */}
       <section className="py-20 px-8 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
@@ -574,10 +371,94 @@ export default function BaliMahaloSurfCo() {
             <div
               className="h-96 bg-cover bg-center rounded-lg"
               style={{
-                backgroundImage: `url('/placeholder.svg?height=600&width=500&text=Balinese+Temple+Ocean')`,
+                backgroundImage: `url('/F2571EE6-9E55-4D14-8CFF-8B151EF73D11.JPG')`,
               }}
             ></div>
           </div>
+        </div>
+      </section>
+
+      {/* Booking Section */}
+      <section id="booking" className="py-20 px-8 bg-white">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-semibold mb-8 text-center text-black">Book with us!</h2>
+          <p className="text-xl text-center mb-12 text-black">
+            Available seven days a week. Once you get in touch, we'll coordinate the ideal time based on surf conditions
+            and your schedule.
+          </p>
+
+          <Card className="border-2 border-gray-200">
+            <CardContent className="p-8">
+              <form id="booking-form" action={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-black mb-2">
+                      First Name *
+                    </label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      required
+                      className="border-gray-300"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="block text-sm font-medium text-black mb-2">
+                      Last Name *
+                    </label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      required
+                      className="border-gray-300"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
+                    Email *
+                  </label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="border-gray-300"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-black mb-2">
+                    Message *
+                  </label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows={4}
+                    className="border-gray-300"
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-black text-white hover:bg-gray-800 py-3 text-lg font-medium disabled:opacity-50"
+                >
+                  {isSubmitting ? "Sending..." : "Submit"}
+                </Button>
+                
+                {submitMessage && (
+                  <p className={`text-center ${submitMessage.includes('Thank you') ? 'text-green-600' : 'text-red-600'}`}>
+                    {submitMessage}
+                  </p>
+                )}
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
